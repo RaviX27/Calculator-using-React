@@ -1,17 +1,72 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
 
 function App() {
-  function handleNumber(){
-    alert('handle number click');
+    const [calc, setcalc] = React.useState({
+      current: "0",
+      total: "0",
+      isInitial: true,
+      perOp: ""
+    });
+
+
+
+  function handleNumber(value){
+    let newValue = value;
+
+    if(!calc.isInitial){
+      newValue = calc.current+value;
+    }
+    setcalc({current: newValue, total:calc.total, isInitial: false, perOp: calc.perOp});
   }
 
-  function handleOperator(){
 
+
+  function handleOperator(value){
+    const total = doCalculation();
+    setcalc({current: total.toString(), total: total.toString(), isInitial: true, perOp: value});
+
+  }
+
+  function doCalculation(){
+    let total = parseInt(calc.total);
+
+    switch(calc.perOp){
+      case "+":
+        total += parseInt(calc.current);
+        break;
+      case "-":
+        total -= parseInt(calc.current);
+        break;
+      case "*":
+        total *= parseInt(calc.current);
+        break;
+      case "/":
+        total /= parseInt(calc.current);
+        break;
+      default:
+        total = parseInt(calc.current);
+
+    }
+    return total;
+  }
+
+  function handleClear(){
+    setcalc({
+      current: "0",
+      total: "0",
+      isInitial: true,
+      perOp: ""
+    });
+  }
+
+
+  function renderDisplay(){
+    return calc.current;
   }
   return (
     <div className="App">
-      <div className='display'>0</div>
+      <div className='display'>{renderDisplay()}</div>
       <CalcButton value="7" onClick={handleNumber}/>
       <CalcButton value="8" onClick={handleNumber}/>
       <CalcButton value="9" onClick={handleNumber}/>
@@ -27,16 +82,16 @@ function App() {
       <CalcButton value="1" onClick={handleNumber}/>
       <CalcButton className="operator" value="-" onClick={handleOperator}/>
 
-      <CalcButton value="C"/>
+      <CalcButton value="C" onClick={handleClear}/>
       <CalcButton value="0" onClick={handleNumber}/>
-      <CalcButton value="="/>
+      <CalcButton value="=" onClick={handleOperator}/>
       <CalcButton className="operator" value="+" onClick={handleOperator}/>
     </div>
   );
 }
 
 function CalcButton(props){
-  return <button className={props.className} onClick={props.onClick}>{props.value}</button>
+  return <button className={props.className} onClick={() => props.onClick(props.value)}>{props.value}</button>
 
 }
 
